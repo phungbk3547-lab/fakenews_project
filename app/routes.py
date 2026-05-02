@@ -3,6 +3,8 @@ from .models import History
 from . import db
 from .predictor import predict_text, extract_keywords
 
+from datetime import timezone, timedelta
+
 main = Blueprint("main", __name__)
 
 # ==========================================
@@ -30,13 +32,16 @@ COMMON_FAKE_WORDS = [
 def home():
     return render_template("index.html")
 
+
 @main.route("/history")
 def history_page():
     return render_template("history.html")
 
+
 @main.route("/stats")
 def stats_page():
     return render_template("stats.html")
+
 
 # ==========================================
 # PREDICT API
@@ -56,7 +61,6 @@ def predict():
     ai_result, ai_confidence = predict_text(text)
     keywords = extract_keywords(text)
 
-    # 🔥 FIX CHUẨN CONFIDENCE
     try:
         ai_confidence = float(ai_confidence)
     except:
@@ -66,7 +70,6 @@ def predict():
     if ai_confidence <= 1:
         ai_confidence *= 100
 
-    # clamp 0–100 (KHÔNG chia nữa)
     ai_confidence = max(0, min(ai_confidence, 100))
 
     # =============================
@@ -119,7 +122,7 @@ def predict():
         "result": final_result,
         "confidence": round(final_confidence, 2),
         "keywords": keywords,
-        "danger_words": suspicious_words,   # 🔥 để frontend highlight
+        "danger_words": suspicious_words,  # 🔥 frontend highlight
         "debug": {
             "suspicious_count": suspicious_count,
             "common_count": common_count
@@ -128,10 +131,8 @@ def predict():
 
 
 # ==========================================
-# HISTORY
+# HISTORY API
 # ==========================================
-
-from datetime import timezone, timedelta
 
 @main.route("/get-history", methods=["GET"])
 def get_history():
@@ -140,21 +141,27 @@ def get_history():
     VN_TZ = timezone(timedelta(hours=7))
 
     data = []
+
     for r in records:
-        # Nếu datetime chưa có timezone → ép về UTC rồi chuyển sang VN
+        # ép timezone về UTC nếu chưa có
         if r.created_at.tzinfo is None:
             dt = r.created_at.replace(tzinfo=timezone.utc)
         else:
             dt = r.created_at
 
+        # convert sang giờ VN
         vn_time = dt.astimezone(VN_TZ)
+
+        # 🔥 lấy keyword để highlight
+        danger_words = extract_keywords(r.content)
 
         data.append({
             "id": r.id,
             "content": r.content,
             "result": r.result,
             "confidence": r.confidence,
-            "created_at": vn_time.isoformat()
+            "created_at": vn_time.isoformat(),
+            "danger_words": danger_words
         })
 
     return jsonify(data)

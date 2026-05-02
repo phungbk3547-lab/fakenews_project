@@ -3,53 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thống kê Dữ liệu - FakeNews Detector</title>
-    <!-- Google Fonts: Be Vietnam Pro -->
+    <title>Thống kê - FakeNews Detector</title>
+
+    <!-- Font + Bootstrap -->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand font-weight-bold" href="/"><span>FakeNews</span> Detector</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/history">Lịch sử</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/stats">Thống kê</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container mt-5 main-content">
-        <h2 class="text-center mb-5 title-tech">Thống kê Dữ liệu Hệ thống</h2>
-        
-        <div class="row g-4">
-            <!-- Biểu đồ Tròn -->
-            <div class="col-md-6">
-                <div class="glass-card p-4 h-100 text-center">
-                    <h5 class="mb-4 fw-600 text-muted">Tỉ lệ Tin Thật / Tin Giả</h5>
-                    <div style="max-width: 280px; margin: auto;">
-                        <canvas id="pieChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Biểu đồ Cột -->
-            <div class="col-md-6">
-                <div class="glass-card p-4 h-100 text-center">
-                    <h5 class="mb-4 fw-600 text-muted">Độ tin cậy trung bình (%)</h5>
-                    <div style="width: 100%; margin: auto; height: 300px;">
-                        <canvas id="barChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <span class="text-danger">FakeNews</span> Detector
+        </a>
+
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/">Trang chủ</a></li>
+            <li class="nav-item"><a class="nav-link" href="/history">Lịch sử</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/stats">Thống kê</a></li>
+        </ul>
     </div>
+</nav>
 
-    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+<!-- CONTENT -->
+<div class="container mt-5">
+    <h2 class="text-center mb-5 fw-bold">Thống kê hệ thống</h2>
+
+    <div class="row g-4">
+
+        <!-- PIE -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center h-100">
+                <h6 class="text-muted mb-3">Tỉ lệ Tin</h6>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- BAR -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center h-100">
+                <h6 class="text-muted mb-3">Độ tin cậy TB</h6>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <!-- LINE (🔥 ăn điểm) -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center h-100">
+                <h6 class="text-muted mb-3">Xu hướng theo ngày</h6>
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+
 </body>
 </html>

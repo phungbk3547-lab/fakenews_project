@@ -1,6 +1,20 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const tableBody = document.getElementById('historyTableBody');
 
+    // 🔥 HÀM HIGHLIGHT TỪ KHÓA
+    function highlightText(text, keywords) {
+        if (!keywords || keywords.length === 0) return text;
+
+        let result = text;
+
+        keywords.forEach(word => {
+            const regex = new RegExp(`(${word})`, 'gi');
+            result = result.replace(regex, '<span class="highlight">$1</span>');
+        });
+
+        return result;
+    }
+
     try {
         const response = await fetch('/get-history');
         const data = await response.json();
@@ -17,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             const confidence = Number(item.confidence).toFixed(2) + '%';
 
-            // 🔥 FIX CHUẨN GIỜ VN (KHÔNG BỊ LỆCH)
+            // 🔥 FORMAT GIỜ VN
             const time = new Date(item.created_at).toLocaleString('vi-VN', {
                 timeZone: 'Asia/Ho_Chi_Minh',
                 year: 'numeric',
@@ -28,10 +42,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 second: '2-digit'
             });
 
+            // 🔥 HIGHLIGHT NỘI DUNG
+            const highlightedContent = highlightText(item.content, item.danger_words);
+
             html += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.content}</td>
+                    <td class="content-cell">${highlightedContent}</td>
                     <td><span class="badge ${badgeClass}">${item.result}</span></td>
                     <td>${confidence}</td>
                     <td>${time}</td>

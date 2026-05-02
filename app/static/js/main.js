@@ -1,69 +1,114 @@
-async function checkNews() {
-    const inputNews = document.getElementById('newsInput').value;
-    if(inputNews.trim() === "") return alert("Vui lòng nhập nội dung tin tức!");
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('newsInput');
+    const preview = document.getElementById('highlightedText');
 
-    const btnPredict = document.getElementById('btnPredict');
-    const btnText = document.getElementById('btnText');
-    const btnSpinner = document.getElementById('btnSpinner');
+    // 🔥 từ khóa giống backend
+    const dangerWords = [
+        "trúng thưởng", "miễn phí", "khẩn cấp", "xác thực",
+        "link", "http", "tài khoản", "50 triệu", "chia sẻ"
+    ];
 
-    // Loading
-    btnPredict.disabled = true;
-    btnText.textContent = "Đang xử lý...";
-    btnSpinner.classList.remove('d-none');
+    // 🔥 giải thích tooltip
+    const dangerExplain = {
+        "link": "Có thể dẫn đến trang lừa đảo",
+        "http": "Đường link không an toàn",
+        "trúng thưởng": "Chiêu trò scam phổ biến",
+        "miễn phí": "Dễ dụ người dùng",
+        "khẩn cấp": "Tạo cảm giác hoảng loạn",
+        "xác thực": "Giả mạo yêu cầu bảo mật",
+        "tài khoản": "Thông tin nhạy cảm",
+        "50 triệu": "Mồi nhử tài chính",
+        "chia sẻ": "Lan truyền tin giả"
+    };
 
-    try {
-        const response = await fetch('/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: inputNews })
+    // 🔥 highlight realtime
+    function highlightRealtime(text) {
+        let result = text;
+
+        dangerWords.forEach(word => {
+            const reason = dangerExplain[word] || "Từ khóa đáng ngờ";
+
+            const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escaped})`, 'gi');
+
+            result = result.replace(
+                regex,
+                `<span class="highlight" data-tooltip="${reason}">$1</span>`
+            );
         });
 
-        const data = await response.json();
-
-        if(data.error) {
-            alert("Lỗi: " + data.error);
-            return;
-        }
-
-        const resultCard = document.getElementById('resultCard');
-        const predictionBadge = document.getElementById('predictionBadge');
-        resultCard.classList.remove('d-none');
-
-        // ✅ FIX: KHÔNG nhân 100 nữa
-        const confidencePercent = data.confidence.toFixed(2);
-
-        // ✅ FIX LABEL
-        if (data.result === "Tin Giả") {
-            predictionBadge.textContent = `Cảnh báo: Tin Giả (${confidencePercent}%)`;
-            predictionBadge.className = "badge bg-danger fs-6";
-        } else {
-            predictionBadge.textContent = `Tin Thật (${confidencePercent}%)`;
-            predictionBadge.className = "badge bg-success fs-6";
-        }
-
-        // =============================
-        // 🔥 HIGHLIGHT TỪ NGUY HIỂM
-        // =============================
-        let highlightedHTML = inputNews;
-
-        if(data.danger_words && data.danger_words.length > 0) {
-            data.danger_words.forEach(word => {
-                const regex = new RegExp(`(${word})`, 'gi');
-                highlightedHTML = highlightedHTML.replace(
-                    regex,
-                    '<span class="danger">$1</span>'
-                );
-            });
-        }
-
-        document.getElementById('highlightedText').innerHTML = highlightedHTML;
-
-    } catch (error) {
-        alert("Lỗi kết nối Server!");
-        console.error(error);
-    } finally {
-        btnPredict.disabled = false;
-        btnText.textContent = "Dự đoán ngay";
-        btnSpinner.classList.add('d-none');
+        return result;
     }
+
+    // 🔥 realtime khi gõ
+    input.addEventListener('input', () => {
+        const text = input.value;
+        preview.innerHTML = highlightRealtime(text);
+    });
+});
+
+
+// 🔥 CALL BACKEND
+async function checkNews() {
+    const text = document.getElementById("newsInput").value;
+
+    const btnText = document.getElementById("btnText");
+    const spinner = document.getElementById("btnSpinner");
+
+    btnText.innerText = "Đang xử lý...";
+    spinner.classList.remove("d-none");
+
+    const res = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+    });
+
+    const data = await res.json();
+
+    btnText.innerText = "Dự đoán ngay";
+    spinner.classList.add("d-none");
+
+    // 🔥 HIỂN THỊ RESULT
+    document.getElementById("resultCard").classList.remove("d-none");
+
+    const badge = document.getElementById("predictionBadge");
+    badge.innerText = data.result + " (" + data.confidence + "%)";
+    badge.className = "badge " + (data.result === "Tin Giả" ? "bg-danger" : "bg-success");
+
+    // 🔥 highlight theo backend (chuẩn hơn realtime)
+    const highlighted = highlightBackend(text, data.danger_words);
+    document.getElementById("highlightedText").innerHTML = highlighted;
+}
+
+
+// 🔥 highlight theo backend (chuẩn AI)
+function highlightBackend(text, keywords) {
+    const dangerExplain = {
+        "link": "Có thể dẫn đến trang lừa đảo",
+        "http": "Đường link không an toàn",
+        "trúng thưởng": "Chiêu trò scam phổ biến",
+        "miễn phí": "Dễ dụ người dùng",
+        "khẩn cấp": "Tạo cảm giác hoảng loạn",
+        "xác thực": "Giả mạo yêu cầu bảo mật",
+        "tài khoản": "Thông tin nhạy cảm",
+        "50 triệu": "Mồi nhử tài chính",
+        "chia sẻ": "Lan truyền tin giả"
+    };
+
+    let result = text;
+
+    keywords.forEach(word => {
+        const reason = dangerExplain[word] || "Từ khóa đáng ngờ";
+
+        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+
+        result = result.replace(
+            regex,
+            `<span class="highlight" data-tooltip="${reason}">$1</span>`
+        );
+    });
+
+    return result;
 }

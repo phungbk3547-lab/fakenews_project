@@ -198,3 +198,64 @@ body {
     white-space: nowrap;
     z-index: 999;
 }
+/* 🔥 Highlight đẹp */
+.highlight {
+    background: linear-gradient(45deg, #ff4d4f, #ff7875);
+    color: white;
+    padding: 3px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: 0.2s;
+}
+
+.highlight:hover {
+    transform: scale(1.05);
+}
+
+/* 🔥 TOOLTIP POPUP */
+.highlight::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    
+    font-size: 12px;
+    white-space: nowrap;
+    
+    opacity: 0;
+    pointer-events: none;
+
+    transition: all 0.25s ease;
+}
+
+/* 🔥 arrow */
+.highlight::before {
+    content: '';
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.85);
+
+    opacity: 0;
+    transition: 0.25s;
+}
+
+/* 🔥 hover hiện ra */
+.highlight:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+.highlight:hover::before {
+    opacity: 1;
+}

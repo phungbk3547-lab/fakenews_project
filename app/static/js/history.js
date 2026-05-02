@@ -1,15 +1,37 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const tableBody = document.getElementById('historyTableBody');
 
-    // 🔥 HÀM HIGHLIGHT TỪ KHÓA
+    // 🔥 MAP GIẢI THÍCH TỪ KHÓA
+    const dangerExplain = {
+        "link": "Có thể chứa liên kết lừa đảo",
+        "http": "Đường link không an toàn",
+        "trúng thưởng": "Chiêu trò scam phổ biến",
+        "miễn phí": "Dễ gây dụ người dùng",
+        "khẩn cấp": "Tạo tâm lý hoảng loạn",
+        "xác thực": "Giả mạo yêu cầu xác thực",
+        "tài khoản": "Liên quan thông tin nhạy cảm",
+        "50 triệu": "Mồi nhử tài chính",
+        "chia sẻ": "Dấu hiệu lan truyền tin giả"
+    };
+
+    // 🔥 HÀM HIGHLIGHT + TOOLTIP
     function highlightText(text, keywords) {
         if (!keywords || keywords.length === 0) return text;
 
         let result = text;
 
         keywords.forEach(word => {
-            const regex = new RegExp(`(${word})`, 'gi');
-            result = result.replace(regex, '<span class="highlight">$1</span>');
+            const reason = dangerExplain[word] || "Từ khóa đáng ngờ";
+
+            // tránh lỗi ký tự đặc biệt
+            const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+            const regex = new RegExp(`(${escapedWord})`, 'gi');
+
+            result = result.replace(
+                regex,
+                `<span class="highlight" title="${reason}">$1</span>`
+            );
         });
 
         return result;
@@ -42,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 second: '2-digit'
             });
 
-            // 🔥 HIGHLIGHT NỘI DUNG
+            // 🔥 HIGHLIGHT NỘI DUNG + TOOLTIP
             const highlightedContent = highlightText(item.content, item.danger_words);
 
             html += `

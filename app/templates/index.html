@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detection - Tech & Pastel</title>
+    <!-- Google Fonts: Be Vietnam Pro -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    </div>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold" href="/"><span>FakeNews</span> Detector</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/history">Lịch sử</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/stats">Thống kê</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h2 class="title-tech mb-4">Hệ thống Phát hiện Tin giả mạo</h2>
+                
+                <div class="glass-card p-4">
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-600 text-muted">Nhập nội dung tin tức cần kiểm tra:</label>
+                        <textarea class="form-control tech-input" id="newsInput" rows="5" placeholder="Dán nội dung tin tức vào đây..."></textarea>
+                    </div>
+                    
+                    <button class="btn btn-predict w-100" id="btnPredict" onclick="checkNews()">
+                        <span id="btnText">Dự đoán ngay</span>
+                        <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    </button>
+                </div>
+
+                <div class="card mt-4 d-none result-glass" id="resultCard">
+                    <div class="card-header fw-bold border-0 bg-transparent">
+                        Kết quả: <span id="predictionBadge" class="badge"></span>
+                    </div>
+                    <div class="card-body pt-0">
+                        <h6 class="card-title text-muted" style="font-size: 0.9rem;">Văn bản nhận diện:</h6>
+                        <p class="card-text lh-lg" id="highlightedText"></p> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
